@@ -36,9 +36,11 @@
 }
 .side_bar {
   padding: 20px;
-  width: 40%;
-  max-width: 400px;
+  width: 30%;
+  min-width: 250px;
   background: white;
+  display: flex;
+  flex-direction: column;
 }
 
 .home_header {
@@ -67,13 +69,18 @@
 
 .project {
   display: flex;
-  justify-content: space-between;
   align-items: center;
   margin: 10px 5px;
   cursor: pointer;
+  font-size: 1.5rem;
 }
 .project_name {
+  max-width: 170px;
+  word-break: break-all;
+  word-wrap: break-word;
   flex-wrap: wrap;
+  flex-grow: 1;
+  padding: 5px;
 }
 .project div {
   font-size: 1.5rem;
@@ -83,13 +90,15 @@
 .projects {
   max-height: 400px;
   overflow: auto;
+  margin: 10px 0;
 }
 
 .icons img {
   margin: 0 5px;
 }
 
-.project_window {
+.project_window,
+.edit_window {
   background-color: lightgray;
   border-radius: 10px;
   margin: 10px 0;
@@ -99,12 +108,18 @@
   font-size: 1.5rem;
   border-bottom: 1px solid black;
 }
-.project_window div {
+.project_window div,
+.edit_window div {
   margin: 10px 0;
+}
+
+.add_project {
+  width: 100%;
 }
 
 .all_tasks {
   width: 100%;
+  height: 100%;
   background-color: lightgray;
   display: flex;
   flex-direction: column;
@@ -127,8 +142,8 @@
   background-color: var(--nav_footer-color);
   top: 30%;
   left: 40%;
-  padding: 10px;
-  border-radius: 5px;
+  padding: 20px;
+  border-radius: 10px;
   width: 40%;
   max-width: 300px;
 }
@@ -144,6 +159,47 @@
   justify-content: center;
   align-items: center;
   flex-direction: row;
+}
+
+.tasks_label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--nav_footer-color);
+  margin: 0 10px 10px;
+  padding: 10px 2%;
+  border-radius: 5px;
+}
+
+.tasks_label div {
+  width: 20%;
+  font-size: 1.5rem;
+  text-align: left;
+}
+
+.task {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--nav_footer-color);
+  margin: 10px 10px;
+  padding: 10px 2%;
+  border-radius: 5px;
+}
+.task div {
+  width: 20%;
+  font-size: 1.5rem;
+  text-align: left;
+}
+
+.delete_edit_task,
+.task_icons {
+  margin-right: 10px;
+  /* width: 50px; */
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  align-items: center;
 }
 
 .hidden {
@@ -186,13 +242,31 @@ footer {
   background-color: var(--nav_footer-color);
   font-size: 1.5rem;
 }
+a img {
+  width: 25px;
+  margin: 10px;
+}
 .window_btn {
-  font-size: 1rem;
+  font-size: 1.2rem;
   font-weight: 500;
-  padding: 10px 10px;
+  padding: 10px 5px;
   width: 49%;
 }
 .task_btn {
   margin-top: 10px;
   width: 80%;
+}
+
+@media (max-width: 700px) {
+  .hero_container {
+    flex-direction: column;
+  }
+  .side_bar {
+    justify-content: center;
+    align-items: center;
+  }
+  .home_items,
+  .home_header {
+    display: none;
+  }
 }

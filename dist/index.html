@@ -35,13 +35,13 @@
             <div class="projects">
               <div class="project"></div>
             </div>
-            <form class="project_window hidden">
+            <form action="" class="project_window hidden" name="new_project">
               <div class="project_header">Project Name:</div>
               <input
                 type="text"
                 id="project_name"
                 placeholder="Enter Project Name"
-                required
+                maxlength="12"
               />
               <div class="project_buttons">
                 <button class="btn window_btn add_new_project">
@@ -52,18 +52,38 @@
                 </button>
               </div>
             </form>
+            <form action="" class="edit_window hidden" name="new_project">
+              <div class="project_header">Project Name:</div>
+              <input type="text" id="project_name_edit" maxlength="12" />
+              <div class="project_buttons">
+                <button class="btn window_btn submit_edit_project">
+                  Edit project
+                </button>
+                <button class="btn window_btn cancel_edit_project">
+                  Cancel
+                </button>
+              </div>
+            </form>
             <button class="btn add_project">+ Add project</button>
           </div>
         </div>
         <div class="all_tasks">
           <div class="all_tasks_header">All Tasks</div>
+          <div class="tasks_label">
+            <div class="task_title">Title</div>
+            <div class="task_desc">Description</div>
+            <div class="task_date">Due Date</div>
+            <div class="task_notes">Notes</div>
+            <div class="delete_edit_task">Edit/Delete</div>
+          </div>
+          <div class="tasks_container"></div>
           <button class="btn add_task_btn">+ Add task</button>
         </div>
       </div>
       <footer>
         Copyright © 2022 JukiX
         <a href="https://github.com/JukiX"
-          ><img src="./icons/GitHub-Mark-32px.png" alt=""
+          ><img src="./GitHub-Mark-32px.png" alt=""
         /></a>
       </footer>
 
