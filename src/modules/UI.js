@@ -1,18 +1,14 @@
-import Task from "./Task";
-import Project from "./Project";
 import Store from "./Storage";
-
 import Del from "../icons/delete.png";
 import Edit from "../icons/edit.png";
 
-const projectWindow = document.querySelector(".project_window");
 export default class UI {
   static currentProject = "";
   static loadPage() {
+    UI.initProjectButtons();
     UI.displayProjects();
   }
   static initProjectButtons() {
-    let editedProjectName;
     document.addEventListener("click", function (e) {
       e.preventDefault();
     });
@@ -25,36 +21,8 @@ export default class UI {
     document
       .querySelector(".add_project")
       .addEventListener("click", UI.toggleProjectWindow);
-    document.querySelectorAll(".project").forEach((project) =>
-      project.addEventListener("click", function (e) {
-        if (e.target.classList.contains("delete_project")) {
-          UI.deleteProject(
-            e.target.parentElement.parentElement.firstElementChild.textContent
-          );
-        } else if (e.target.classList.contains("edit_project")) {
-          UI.editProject(
-            e.target.parentElement.parentElement.firstElementChild.innerText
-          );
-          editedProjectName =
-            e.target.parentElement.parentElement.firstElementChild.textContent;
-        } else if (e.target.classList.contains("project_name")) {
-          UI.currentProject = e.target.innerText;
-          UI.displayProjectsTasks();
-        }
-      })
-    );
-    document
-      .querySelector(".submit_edit_project")
-      .addEventListener("click", function () {
-        Store.editProject(
-          editedProjectName,
-          document.querySelector("#project_name_edit").value
-        );
-        UI.displayProjects();
-      });
-    document
-      .querySelector(".cancel_edit_project")
-      .addEventListener("click", UI.toggleEditWindow);
+
+    // Add task
     document
       .querySelector(".add_task_btn")
       .addEventListener("click", UI.toggleTaskWindow);
@@ -65,10 +33,76 @@ export default class UI {
     });
     document
       .querySelector(".cancel_task")
-      .addEventListener("click", function (e) {
-        console.log(e.target);
+      .addEventListener("click", function () {
         UI.toggleTaskWindow();
       });
+  }
+  static addProjectAndTaskButtons() {
+    let editedProjectName;
+    document.querySelectorAll(".project_name").forEach((project) =>
+      project.addEventListener("click", function (e) {
+        UI.currentProject = e.target.innerText;
+        UI.displayProjectsTasks();
+      })
+    );
+    document.querySelectorAll(".delete_project").forEach((btn) =>
+      btn.addEventListener("click", function (e) {
+        UI.deleteProject(
+          e.target.parentElement.parentElement.firstElementChild.textContent
+        );
+      })
+    );
+    document.querySelectorAll(".edit_project").forEach((btn) =>
+      btn.addEventListener("click", function (e) {
+        console.log(
+          e.target.parentElement.parentElement.firstElementChild.textContent
+        );
+        UI.editProject(
+          e.target.parentElement.parentElement.firstElementChild.innerText
+        );
+        editedProjectName =
+          e.target.parentElement.parentElement.firstElementChild.textContent;
+      })
+    );
+    //Edit project
+    document
+      .querySelector(".submit_edit_project")
+      .addEventListener("click", function () {
+        Store.editProject(
+          editedProjectName,
+          document.querySelector("#project_name_edit").value
+        );
+        UI.toggleEditWindow();
+        UI.displayProjects();
+      });
+    document
+      .querySelector(".submit_edit_project")
+      .addEventListener("click", UI.toggleEditWindow);
+    document
+      .querySelector(".cancel_edit_project")
+      .removeEventListener("click", UI.toggleEditWindow);
+    document
+      .querySelector(".cancel_edit_project")
+      .addEventListener("click", UI.toggleEditWindow);
+
+    //Delete task
+    document.querySelectorAll(".task").forEach((task) => {
+      task.addEventListener("click", function (e) {
+        if (e.target.classList.contains("edit_task")) {
+          Store.editTask(
+            UI.currentProject,
+            e.target.parentElement.parentElement.firstElementChild.textContent
+          );
+          UI.displayProjects();
+        } else if (e.target.classList.contains("delete_task")) {
+          Store.deleteTask(
+            UI.currentProject,
+            e.target.parentElement.parentElement.firstElementChild.textContent
+          );
+          UI.displayProjectsTasks();
+        }
+      });
+    });
   }
   static addProject() {
     const projectName = document.querySelector("#project_name");
@@ -81,7 +115,7 @@ export default class UI {
 
   static toggleProjectWindow() {
     UI.clearFields();
-    projectWindow.classList.toggle("hidden");
+    document.querySelector(".project_window").classList.toggle("hidden");
   }
   static toggleTaskWindow() {
     document.querySelector(".task_window").classList.toggle("hidden");
@@ -103,8 +137,8 @@ export default class UI {
         </div>`;
         projectsContainer.insertAdjacentHTML("beforeend", projectTemplate);
       }
-    }),
-      UI.initProjectButtons();
+    });
+    UI.addProjectAndTaskButtons();
   }
   static deleteProject(name) {
     Store.removeProject(name);
@@ -122,14 +156,13 @@ export default class UI {
     return { title, description, date, notes };
   }
   static newTask() {
-    console.log();
     if (!UI.currentProject) return;
     Store.addTask(UI.currentProject, UI.getTaskData());
   }
   static clearFields() {
     document.querySelector("#project_name").value = "";
   }
-  static displayProjectsTasks(projectName) {
+  static displayProjectsTasks() {
     document.querySelector(".tasks_container").innerHTML = "";
     if (
       UI.currentProject === "" ||
@@ -146,8 +179,8 @@ export default class UI {
       <div class='task_date'>${task.date}</div>
       <div class='task_notes'>${task.notes}</div>
       <div class="task_icons">
-          <img src=${Edit} alt="edit_task" class='edit_project'>
-          <img src=${Del} alt="delete_task" class='delete_project'>
+          <img src=${Edit} alt="edit_task" class='edit_task'>
+          <img src=${Del} alt="delete_task" class='delete_task'>
         </div>
       </div>
       `;
@@ -155,5 +188,6 @@ export default class UI {
         .querySelector(".tasks_container")
         .insertAdjacentHTML("beforeend", taskTemplate);
     });
+    UI.addProjectAndTaskButtons();
   }
 }

@@ -68,6 +68,41 @@
           </div>
         </div>
         <div class="all_tasks">
+          <div class="task_window hidden">
+            <div class="title_div">
+              <label for="title">Title</label>
+              <input
+                type="text"
+                id="title"
+                placeholder="What to do?"
+                required
+              />
+            </div>
+            <div class="desc_div">
+              <label for="description">Description(Optional)</label>
+              <textarea
+                type="text"
+                id="description"
+                placeholder="I'm just gonna procrastinate."
+              ></textarea>
+            </div>
+            <div class="date_div">
+              <label for="date">DueDate</label>
+              <input type="date" id="date" />
+            </div>
+            <div class="notes_div">
+              <label for="notes">Notes</label>
+              <textarea
+                type="text"
+                id="notes"
+                placeholder="Some notes."
+              ></textarea>
+            </div>
+            <div class="task_buttons">
+              <button class="btn task_btn add_task">Add task</button>
+              <button class="btn task_btn cancel_task">Cancel</button>
+            </div>
+          </div>
           <div class="all_tasks_header">All Tasks</div>
           <div class="tasks_label">
             <div class="task_title">Title</div>
@@ -86,33 +121,6 @@
           ><img src="./GitHub-Mark-32px.png" alt=""
         /></a>
       </footer>
-
-      <div class="task_window hidden">
-        <div class="title_div">
-          <label for="title">Title</label>
-          <input type="text" id="title" placeholder="What to do?" required />
-        </div>
-        <div class="desc_div">
-          <label for="description">Description(Optional)</label>
-          <textarea
-            type="text"
-            id="description"
-            placeholder="I'm just gonna procrastinate."
-          ></textarea>
-        </div>
-        <div class="date_div">
-          <label for="date">DueDate</label>
-          <input type="date" id="date" />
-        </div>
-        <div class="notes_div">
-          <label for="notes">Notes</label>
-          <textarea type="text" id="notes" placeholder="Some notes."></textarea>
-        </div>
-        <div class="task_buttons">
-          <button class="btn task_btn add_task">Add task</button>
-          <button class="btn task_btn cancel_task">Cancel</button>
-        </div>
-      </div>
     </div>
   </body>
 </html>

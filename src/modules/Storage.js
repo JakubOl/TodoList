@@ -45,7 +45,7 @@ export default class Store {
   static addTask(projectName, taskData) {
     const projects = Store.getProjects();
     projects.map(function (item) {
-      if (item.name === projectName)
+      if (item.name === projectName) {
         item.tasks.push(
           new Task(
             taskData.title,
@@ -54,8 +54,30 @@ export default class Store {
             taskData.notes
           )
         );
+      }
     });
     localStorage.setItem("projects", JSON.stringify(projects));
-    console.log(Store.getProjects());
+  }
+  static deleteTask(projectName, taskName) {
+    const projects = Store.getProjects();
+    projects.map(function (project) {
+      if (project.name === projectName)
+        return (project.tasks = project.tasks.filter(
+          (task) => task.title !== taskName
+        ));
+    });
+    localStorage.setItem("projects", JSON.stringify(projects));
+  }
+  static editTask(projectName, taskName, taskData) {
+    const projects = Store.getProjects();
+    projects.map(function (project) {
+      if (project.name === projectName)
+        return (project.tasks = project.tasks.map((task) => {
+          if (task.title === taskName) {
+            return (task.title = taskData.newName);
+          }
+        }));
+    });
+    localStorage.setItem("projects", JSON.stringify(projects));
   }
 }
