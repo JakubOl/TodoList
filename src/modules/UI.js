@@ -6,117 +6,88 @@ export default class UI {
   static currentProject = "";
   static currentTask = "";
   static loadPage() {
-    UI.initProjectButtons();
+    UI.initButtons();
     UI.displayProjects();
+    UI.addProjectAndTaskButtons();
   }
-  static initProjectButtons() {
+  static initButtons() {
     document.addEventListener("click", function (e) {
       e.preventDefault();
-    });
-    document
-      .querySelector(".add_new_project")
-      .addEventListener("click", UI.addProject);
-    document
-      .querySelector(".cancel_new_project")
-      .addEventListener("click", UI.toggleProjectWindow);
-    document
-      .querySelector(".add_project")
-      .addEventListener("click", UI.toggleProjectWindow);
-
-    // Add task
-    document
-      .querySelector(".add_task_btn")
-      .addEventListener("click", UI.toggleTaskWindow);
-    document.querySelector(".btn.done").addEventListener("click", function (e) {
-      if (e.target.textContent === "Done") {
-        e.target.textContent = "Not Done";
-        e.target.value = false;
-      } else {
-        e.target.textContent = "Done";
-        e.target.value = true;
+      if (UI.targetContains(e, "add_new_project")) {
+        UI.addProject();
+      } else if (
+        UI.targetContains(e, "cancel_new_project") ||
+        UI.targetContains(e, "add_project")
+      ) {
+        UI.toggleProjectWindow();
+      } else if (UI.targetContains(e, "btn_done")) {
+        if (e.target.textContent === "Done") {
+          e.target.textContent = "Not Done";
+          e.target.value = false;
+        } else {
+          e.target.textContent = "Done";
+          e.target.value = true;
+        }
+      } else if (
+        UI.targetContains(e, "add_task_btn") ||
+        UI.targetContains(e, "cancel_task")
+      ) {
+        UI.toggleTaskWindow();
+      } else if (UI.targetContains(e, "add_task")) {
+        UI.newTask();
+        UI.displayProjectsTasks();
+        UI.toggleTaskWindow();
+      } else if (UI.targetContains(e, "today")) {
+        UI.displayToday();
+      } else if (UI.targetContains(e, "week")) {
+        UI.displayThisWeek();
+      } else if (UI.targetContains(e, "not_done")) {
+        UI.doneStatusDisplay("false");
+      } else if (UI.targetContains(e, "done")) {
+        UI.doneStatusDisplay("true");
       }
     });
-    document.querySelector(".add_task").addEventListener("click", function () {
-      UI.newTask();
-      UI.displayProjectsTasks();
-      UI.toggleTaskWindow();
-    });
-    document
-      .querySelector(".cancel_task")
-      .addEventListener("click", function () {
-        UI.toggleTaskWindow();
-      });
-    document.querySelector(".today").addEventListener("click", UI.displayToday);
-    document
-      .querySelector(".week")
-      .addEventListener("click", UI.displayThisWeek);
-
-    document
-      .querySelector(".not_done")
-      .addEventListener("click", UI.displayNotDone);
-    document.querySelector(".done").addEventListener("click", UI.displayDone);
+  }
+  static targetContains(e, classItem) {
+    return e.target.classList.contains(classItem);
   }
   static addProjectAndTaskButtons() {
     let editedProjectName;
-    document.querySelectorAll(".project_name").forEach((project) =>
-      project.addEventListener("click", function (e) {
+    document.body.addEventListener("click", function (e) {
+      if (UI.targetContains(e, "project_name")) {
         UI.currentProject = e.target.innerText;
         UI.displayProjectsTasks();
-      })
-    );
-    document.querySelectorAll(".delete_project").forEach((btn) =>
-      btn.addEventListener("click", function (e) {
+      } else if (UI.targetContains(e, "delete_project")) {
         UI.deleteProject(
           e.target.parentElement.parentElement.firstElementChild.textContent
         );
-      })
-    );
-    document.querySelectorAll(".edit_project").forEach((btn) =>
-      btn.addEventListener("click", function (e) {
+      } else if (UI.targetContains(e, "edit_project")) {
         UI.editProject(
           e.target.parentElement.parentElement.firstElementChild.innerText
         );
         editedProjectName =
           e.target.parentElement.parentElement.firstElementChild.textContent;
-      })
-    );
-    //Edit project
-    document
-      .querySelector(".submit_edit_project")
-      .addEventListener("click", function () {
+      } else if (UI.targetContains(e, "submit_edit_project")) {
         Store.editProject(
           editedProjectName,
           document.querySelector("#project_name_edit").value
         );
-        UI.toggleEditWindow();
         UI.displayProjects();
-      });
-    document
-      .querySelector(".submit_edit_project")
-      .addEventListener("click", UI.toggleEditWindow);
-    document
-      .querySelector(".cancel_edit_project")
-      .removeEventListener("click", UI.toggleEditWindow);
-    document
-      .querySelector(".cancel_edit_project")
-      .addEventListener("click", UI.toggleEditWindow);
-
-    //Delete task
-    document.querySelectorAll(".task").forEach((task) => {
-      task.addEventListener("click", function (e) {
-        if (e.target.classList.contains("edit_task")) {
-          UI.loadTaskData(
-            e.target.parentElement.parentElement.firstElementChild.textContent
-          );
-          UI.toggleTaskWindow();
-        } else if (e.target.classList.contains("delete_task")) {
-          Store.deleteTask(
-            UI.currentProject,
-            e.target.parentElement.parentElement.firstElementChild.textContent
-          );
-          UI.displayProjectsTasks();
-        }
-      });
+        UI.toggleEditWindow();
+      } else if (UI.targetContains(e, "cancel_edit_project")) {
+        UI.toggleEditWindow();
+      } else if (UI.targetContains(e, "edit_task")) {
+        UI.loadTaskData(
+          e.target.parentElement.parentElement.firstElementChild.textContent
+        );
+        UI.toggleTaskWindow();
+      } else if (UI.targetContains(e, "delete_task")) {
+        Store.deleteTask(
+          UI.currentProject,
+          e.target.parentElement.parentElement.firstElementChild.textContent
+        );
+        UI.displayProjectsTasks();
+      }
     });
   }
   static addProject() {
@@ -124,21 +95,23 @@ export default class UI {
     if (!projectName.value) return;
     Store.addProject(projectName.value);
     UI.toggleProjectWindow();
-    UI.clearFields();
     UI.displayProjects();
   }
 
   static toggleProjectWindow() {
-    UI.clearFields();
+    UI.clearInputFields();
     document.querySelector(".project_window").classList.toggle("hidden");
   }
   static toggleTaskWindow() {
+    UI.clearInputFields();
     document.querySelector(".task_window").classList.toggle("hidden");
   }
   static toggleEditWindow() {
+    UI.clearInputFields();
     document.querySelector(".edit_window").classList.toggle("hidden");
   }
   static hideAddTask() {
+    UI.clearInputFields();
     document.querySelector(".add_task_btn").classList.add("hidden");
   }
   static showAddTask() {
@@ -159,7 +132,6 @@ export default class UI {
         projectsContainer.insertAdjacentHTML("beforeend", projectTemplate);
       }
     });
-    UI.addProjectAndTaskButtons();
   }
   static deleteProject(name) {
     Store.removeProject(name);
@@ -174,25 +146,31 @@ export default class UI {
     const description = document.querySelector("#description").value;
     const date = document.querySelector("#date").value;
     const notes = document.querySelector("#notes").value;
-    const done = document.querySelector(".btn.done").value;
+    const done = document.querySelector(".btn_done").value;
     return { title, description, date, notes, done };
   }
-  static setTaskData(taskName) {
-    document.querySelector("#title").value = taskName.title;
-    document.querySelector("#description").value = taskName.description;
-    document.querySelector("#date").value = taskName.date;
-    document.querySelector("#notes").value = taskName.notes;
+  static setTaskData(taskName = "") {
+    document.querySelector("#title").value = taskName?.title;
+    document.querySelector("#description").value = taskName?.description;
+    document.querySelector("#date").value = taskName?.date;
+    document.querySelector("#notes").value = taskName?.notes;
   }
   static newTask() {
-    if (!UI.currentProject) return;
     if (!Store.getTask(UI.currentProject, UI.currentTask)) {
       Store.addTask(UI.currentProject, UI.getTaskData());
       return;
     }
     Store.editTask(UI.currentProject, UI.currentTask, UI.getTaskData());
   }
-  static clearFields() {
+  static clearInputFields() {
     document.querySelector("#project_name").value = "";
+    document.querySelector("#title").value = "";
+    document.querySelector("#description").value = "";
+    document.querySelector("#date").value = "";
+    document.querySelector("#notes").value = "";
+  }
+  static clearTasks() {
+    document.querySelector(".tasks_container").innerHTML = "";
   }
   static taskTemplate(task) {
     const taskTemplate = `
@@ -216,18 +194,12 @@ export default class UI {
   }
 
   static displayProjectsTasks() {
-    if (
-      UI.currentProject === "" ||
-      Store.getProject(UI.currentProject).tasks === []
-    )
-      return;
-    document.querySelector(".tasks_container").innerHTML = "";
+    UI.clearTasks();
     document.querySelector(".all_tasks_header").textContent =
       UI.currentProject + " tasks:";
     Store.getProject(UI.currentProject).tasks.forEach(function (task) {
       UI.taskTemplate(task);
     });
-    UI.addProjectAndTaskButtons();
     UI.showAddTask();
   }
   static loadTaskData(taskName) {
@@ -235,30 +207,16 @@ export default class UI {
     UI.currentTask = taskName;
     UI.setTaskData(task);
   }
-  static displayNotDone() {
-    document.querySelector(".tasks_container").innerHTML = "";
+  static doneStatusDisplay(status) {
+    UI.clearTasks();
     document.querySelector(".all_tasks_header").textContent = "Not done tasks:";
     Store.getProjects().forEach((project) =>
       project.tasks.forEach((task) => {
-        if (task.done === "false") {
+        if (task.done === status) {
           UI.taskTemplate(task);
         }
       })
     );
-    UI.addProjectAndTaskButtons();
-    UI.hideAddTask();
-  }
-  static displayDone() {
-    document.querySelector(".tasks_container").innerHTML = "";
-    document.querySelector(".all_tasks_header").textContent = "Done tasks:";
-    Store.getProjects().forEach((project) =>
-      project.tasks.forEach((task) => {
-        if (task.done === "true") {
-          UI.taskTemplate(task);
-        }
-      })
-    );
-    UI.addProjectAndTaskButtons();
     UI.hideAddTask();
   }
   static getDate() {
@@ -284,7 +242,7 @@ export default class UI {
     return tasksDate >= firstDayOfWeek && tasksDate <= lastDayOfWeek;
   }
   static displayToday() {
-    document.querySelector(".tasks_container").innerHTML = "";
+    UI.clearTasks();
     document.querySelector(".all_tasks_header").textContent = "Today tasks:";
     Store.getProjects().forEach((project) =>
       project.tasks.forEach((task) => {
@@ -292,11 +250,11 @@ export default class UI {
         UI.taskTemplate(task);
       })
     );
-    UI.addProjectAndTaskButtons();
     UI.hideAddTask();
   }
+
   static displayThisWeek() {
-    document.querySelector(".tasks_container").innerHTML = "";
+    UI.clearTasks();
     document.querySelector(".all_tasks_header").textContent =
       "This week tasks:";
     Store.getProjects().forEach((project) =>
@@ -305,7 +263,6 @@ export default class UI {
         UI.taskTemplate(task);
       })
     );
-    UI.addProjectAndTaskButtons();
     UI.hideAddTask();
   }
 }
