@@ -4,6 +4,7 @@ import Edit from "../icons/edit.png";
 
 export default class UI {
   static currentProject = "";
+  static currentTask = "";
   static loadPage() {
     UI.initProjectButtons();
     UI.displayProjects();
@@ -26,6 +27,15 @@ export default class UI {
     document
       .querySelector(".add_task_btn")
       .addEventListener("click", UI.toggleTaskWindow);
+    document.querySelector(".btn.done").addEventListener("click", function (e) {
+      if (e.target.textContent === "Done") {
+        e.target.textContent = "Not Done";
+        e.target.value = false;
+      } else {
+        e.target.textContent = "Done";
+        e.target.value = true;
+      }
+    });
     document.querySelector(".add_task").addEventListener("click", function () {
       UI.newTask();
       UI.displayProjectsTasks();
@@ -36,6 +46,15 @@ export default class UI {
       .addEventListener("click", function () {
         UI.toggleTaskWindow();
       });
+    document.querySelector(".today").addEventListener("click", UI.displayToday);
+    document
+      .querySelector(".week")
+      .addEventListener("click", UI.displayThisWeek);
+
+    document
+      .querySelector(".not_done")
+      .addEventListener("click", UI.displayNotDone);
+    document.querySelector(".done").addEventListener("click", UI.displayDone);
   }
   static addProjectAndTaskButtons() {
     let editedProjectName;
@@ -54,9 +73,6 @@ export default class UI {
     );
     document.querySelectorAll(".edit_project").forEach((btn) =>
       btn.addEventListener("click", function (e) {
-        console.log(
-          e.target.parentElement.parentElement.firstElementChild.textContent
-        );
         UI.editProject(
           e.target.parentElement.parentElement.firstElementChild.innerText
         );
@@ -89,11 +105,10 @@ export default class UI {
     document.querySelectorAll(".task").forEach((task) => {
       task.addEventListener("click", function (e) {
         if (e.target.classList.contains("edit_task")) {
-          Store.editTask(
-            UI.currentProject,
+          UI.loadTaskData(
             e.target.parentElement.parentElement.firstElementChild.textContent
           );
-          UI.displayProjects();
+          UI.toggleTaskWindow();
         } else if (e.target.classList.contains("delete_task")) {
           Store.deleteTask(
             UI.currentProject,
@@ -122,6 +137,12 @@ export default class UI {
   }
   static toggleEditWindow() {
     document.querySelector(".edit_window").classList.toggle("hidden");
+  }
+  static hideAddTask() {
+    document.querySelector(".add_task_btn").classList.add("hidden");
+  }
+  static showAddTask() {
+    document.querySelector(".add_task_btn").classList.remove("hidden");
   }
   static displayProjects() {
     const projectsContainer = document.querySelector(".projects");
@@ -153,41 +174,138 @@ export default class UI {
     const description = document.querySelector("#description").value;
     const date = document.querySelector("#date").value;
     const notes = document.querySelector("#notes").value;
-    return { title, description, date, notes };
+    const done = document.querySelector(".btn.done").value;
+    return { title, description, date, notes, done };
+  }
+  static setTaskData(taskName) {
+    document.querySelector("#title").value = taskName.title;
+    document.querySelector("#description").value = taskName.description;
+    document.querySelector("#date").value = taskName.date;
+    document.querySelector("#notes").value = taskName.notes;
   }
   static newTask() {
     if (!UI.currentProject) return;
-    Store.addTask(UI.currentProject, UI.getTaskData());
+    if (!Store.getTask(UI.currentProject, UI.currentTask)) {
+      Store.addTask(UI.currentProject, UI.getTaskData());
+      return;
+    }
+    Store.editTask(UI.currentProject, UI.currentTask, UI.getTaskData());
   }
   static clearFields() {
     document.querySelector("#project_name").value = "";
   }
-  static displayProjectsTasks() {
-    document.querySelector(".tasks_container").innerHTML = "";
-    if (
-      UI.currentProject === "" ||
-      Store.getProject(UI.currentProject).tasks === []
-    )
-      return;
-    document.querySelector(".all_tasks_header").textContent =
-      UI.currentProject + " tasks:";
-    Store.getProject(UI.currentProject).tasks.forEach(function (task) {
-      const taskTemplate = `
+  static taskTemplate(task) {
+    const taskTemplate = `
       <div class="task">
       <div class='task_name'>${task.title}</div>
       <div class='task_desc'>${task.description}</div>
       <div class='task_date'>${task.date}</div>
       <div class='task_notes'>${task.notes}</div>
+      <div class='task_status'>${
+        task.done === "true" ? "Done" : "Not Done"
+      }</div>
       <div class="task_icons">
           <img src=${Edit} alt="edit_task" class='edit_task'>
           <img src=${Del} alt="delete_task" class='delete_task'>
         </div>
       </div>
       `;
-      document
-        .querySelector(".tasks_container")
-        .insertAdjacentHTML("beforeend", taskTemplate);
+    document
+      .querySelector(".tasks_container")
+      .insertAdjacentHTML("beforeend", taskTemplate);
+  }
+
+  static displayProjectsTasks() {
+    if (
+      UI.currentProject === "" ||
+      Store.getProject(UI.currentProject).tasks === []
+    )
+      return;
+    document.querySelector(".tasks_container").innerHTML = "";
+    document.querySelector(".all_tasks_header").textContent =
+      UI.currentProject + " tasks:";
+    Store.getProject(UI.currentProject).tasks.forEach(function (task) {
+      UI.taskTemplate(task);
     });
     UI.addProjectAndTaskButtons();
+    UI.showAddTask();
+  }
+  static loadTaskData(taskName) {
+    const task = Store.getTask(UI.currentProject, taskName);
+    UI.currentTask = taskName;
+    UI.setTaskData(task);
+  }
+  static displayNotDone() {
+    document.querySelector(".tasks_container").innerHTML = "";
+    document.querySelector(".all_tasks_header").textContent = "Not done tasks:";
+    Store.getProjects().forEach((project) =>
+      project.tasks.forEach((task) => {
+        if (task.done === "false") {
+          UI.taskTemplate(task);
+        }
+      })
+    );
+    UI.addProjectAndTaskButtons();
+    UI.hideAddTask();
+  }
+  static displayDone() {
+    document.querySelector(".tasks_container").innerHTML = "";
+    document.querySelector(".all_tasks_header").textContent = "Done tasks:";
+    Store.getProjects().forEach((project) =>
+      project.tasks.forEach((task) => {
+        if (task.done === "true") {
+          UI.taskTemplate(task);
+        }
+      })
+    );
+    UI.addProjectAndTaskButtons();
+    UI.hideAddTask();
+  }
+  static getDate() {
+    const today = new Date();
+    let year = new Intl.DateTimeFormat("en", { year: "numeric" })
+      .format(today)
+      .padStart(2, 0);
+    let month = new Intl.DateTimeFormat("en", { month: "numeric" })
+      .format(today)
+      .padStart(2, 0);
+    let day = new Intl.DateTimeFormat("en", { day: "2-digit" }).format(today);
+    const date = `${year}-${month}-${day}`;
+    return date;
+  }
+  static isDateInThisWeek(date) {
+    const todayObj = new Date();
+    const todayDate = todayObj.getDate();
+    const todayDay = todayObj.getDay();
+    const firstDayOfWeek = new Date(todayObj.setDate(todayDate - todayDay));
+    const lastDayOfWeek = new Date(firstDayOfWeek);
+    lastDayOfWeek.setDate(lastDayOfWeek.getDate() + 6);
+    const tasksDate = new Date(date);
+    return tasksDate >= firstDayOfWeek && tasksDate <= lastDayOfWeek;
+  }
+  static displayToday() {
+    document.querySelector(".tasks_container").innerHTML = "";
+    document.querySelector(".all_tasks_header").textContent = "Today tasks:";
+    Store.getProjects().forEach((project) =>
+      project.tasks.forEach((task) => {
+        if (task.date !== UI.getDate()) return;
+        UI.taskTemplate(task);
+      })
+    );
+    UI.addProjectAndTaskButtons();
+    UI.hideAddTask();
+  }
+  static displayThisWeek() {
+    document.querySelector(".tasks_container").innerHTML = "";
+    document.querySelector(".all_tasks_header").textContent =
+      "This week tasks:";
+    Store.getProjects().forEach((project) =>
+      project.tasks.forEach((task) => {
+        if (!UI.isDateInThisWeek(task.date)) return;
+        UI.taskTemplate(task);
+      })
+    );
+    UI.addProjectAndTaskButtons();
+    UI.hideAddTask();
   }
 }

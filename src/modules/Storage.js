@@ -51,7 +51,8 @@ export default class Store {
             taskData.title,
             taskData.description,
             taskData.date,
-            taskData.notes
+            taskData.notes,
+            taskData.done
           )
         );
       }
@@ -70,14 +71,25 @@ export default class Store {
   }
   static editTask(projectName, taskName, taskData) {
     const projects = Store.getProjects();
-    projects.map(function (project) {
-      if (project.name === projectName)
-        return (project.tasks = project.tasks.map((task) => {
-          if (task.title === taskName) {
-            return (task.title = taskData.newName);
-          }
-        }));
+    projects.map((project) => {
+      if (project.name !== projectName) return;
+      project.tasks = project.tasks.map((task) => {
+        if (task.title === taskName) {
+          task.title = taskData.title;
+          task.desc = taskData.description;
+          task.date = taskData.date;
+          task.notes = taskData.notes;
+          task.done = taskData.done;
+          return task;
+        } else return task;
+      });
     });
     localStorage.setItem("projects", JSON.stringify(projects));
+  }
+  static getTask(projectName, taskName) {
+    const projects = Store.getProjects();
+    return projects
+      .filter((project) => project.name === projectName)[0]
+      .tasks.filter((task) => task.title === taskName)[0];
   }
 }
