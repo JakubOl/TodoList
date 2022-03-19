@@ -24,10 +24,10 @@
           <div class="projects_date">
             <div class="home_header">Home</div>
             <div class="home_items">
-              <div class="inbox">Inbox</div>
               <div class="today">Today</div>
               <div class="week">This week</div>
-              <div class="important">Important!</div>
+              <div class="done">Done</div>
+              <div class="not_done">Not done</div>
             </div>
           </div>
           <div class="projects_container">
@@ -68,7 +68,7 @@
           </div>
         </div>
         <div class="all_tasks">
-          <div class="task_window hidden">
+          <form class="task_window hidden">
             <div class="title_div">
               <label for="title">Title</label>
               <input
@@ -98,17 +98,19 @@
                 placeholder="Some notes."
               ></textarea>
             </div>
+            <button class="btn done" value="true">Done</button>
             <div class="task_buttons">
               <button class="btn task_btn add_task">Add task</button>
               <button class="btn task_btn cancel_task">Cancel</button>
             </div>
-          </div>
+          </form>
           <div class="all_tasks_header">All Tasks</div>
           <div class="tasks_label">
             <div class="task_title">Title</div>
             <div class="task_desc">Description</div>
             <div class="task_date">Due Date</div>
             <div class="task_notes">Notes</div>
+            <div class="task_done">Done</div>
             <div class="delete_edit_task">Edit/Delete</div>
           </div>
           <div class="tasks_container"></div>

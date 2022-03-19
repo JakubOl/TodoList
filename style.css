@@ -22,11 +22,10 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: var(--nav_footer-color);
+
   overflow: hidden;
   border-bottom: 3px solid green;
 }
-
 .logo {
   font-size: 4rem;
 }
@@ -261,7 +260,7 @@ a img {
   margin-top: 10px;
   width: 80%;
 }
-
+/* 
 @media (max-width: 800px) {
   .hero_container {
     flex-direction: column;
@@ -274,4 +273,8 @@ a img {
   .home_header {
     display: none;
   }
+} */
+.done {
+  width: 150px;
+  align-self: center;
 }
